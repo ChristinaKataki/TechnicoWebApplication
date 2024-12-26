@@ -1,0 +1,6 @@
+@TechnicoWebApplication_HostAddress = http://localhost:5007
+
+GET {{TechnicoWebApplication_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
