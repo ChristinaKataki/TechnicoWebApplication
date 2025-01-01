@@ -8,6 +8,7 @@ using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
+using TechnicoWebApplication.Validators;
 
 namespace TechnicoWebApplication.Services;
 public class RepairService
@@ -25,6 +26,11 @@ public class RepairService
 
     public async Task<ActionResult<RepairResponseDto>> Create(RepairRequestDto repairRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(repairRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{repairRequestDto.Vat}] is not valid.");
+        }
+
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(repairRequestDto.Vat);
         if (propertyOwner == null)
         {
@@ -54,6 +60,11 @@ public class RepairService
 
     public async Task<ActionResult<List<RepairResponseDto>>> FindByOwner(string vat)
     {
+        if (OwnerValidator.VatIsNotValid(vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
+        }
+
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
         {
@@ -68,6 +79,10 @@ public class RepairService
 
     public async Task<ActionResult<RepairResponseDto>> Update(long id, RepairRequestDto repairRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(repairRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{repairRequestDto.Vat}] is not valid.");
+        }
 
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(repairRequestDto.Vat);
         if (propertyOwner == null)

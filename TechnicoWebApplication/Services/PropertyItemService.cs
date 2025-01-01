@@ -8,6 +8,7 @@ using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
+using TechnicoWebApplication.Validators;
 
 namespace TechnicoWebApplication.Services;
 public class PropertyItemService
@@ -25,6 +26,11 @@ public class PropertyItemService
 
     public async Task<ActionResult<PropertyItemResponseDto>> Create(PropertyItemRequestDto propertyItemRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(propertyItemRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{propertyItemRequestDto.Vat}] is not valid.");
+        }
+
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(propertyItemRequestDto.Vat);
         if (propertyOwner == null)
         {
@@ -59,6 +65,11 @@ public class PropertyItemService
 
     public async Task<ActionResult<List<PropertyItemResponseDto>>> FindByOwner(string vat)
     {
+        if (OwnerValidator.VatIsNotValid(vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
+        }
+
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
         {
@@ -73,6 +84,10 @@ public class PropertyItemService
 
     public async Task<ActionResult<PropertyItemResponseDto>> Update(string id, PropertyItemRequestDto propertyItemRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(propertyItemRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{propertyItemRequestDto.Vat}] is not valid.");
+        }
         if (id != propertyItemRequestDto.Id)
         {
             return new BadRequestObjectResult($"Item id specified in path ({id}) is different from item id in request body ({propertyItemRequestDto.Id}).");

@@ -5,6 +5,7 @@ using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
+using TechnicoWebApplication.Validators;
 
 namespace TechnicoWebApplication.Services;
 public class PropertyOwnerService
@@ -20,6 +21,11 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Create(PropertyOwnerRequestDto propertyOwnerRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(propertyOwnerRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{propertyOwnerRequestDto.Vat}] is not valid.");
+        }
+
         PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
 
         if (await _propertyOwnerRepository.Read(propertyOwner.Vat) != null)
@@ -34,6 +40,10 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Read(string vat)
     {
+        if (OwnerValidator.VatIsNotValid(vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
+        }
 
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
@@ -48,6 +58,16 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
     {
+        if (OwnerValidator.VatIsNotValid(propertyOwnerRequestDto.Vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{propertyOwnerRequestDto.Vat}] is not valid.");
+        }
+
+        if (OwnerValidator.VatIsNotValid(vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
+        }
+
         PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
 
         if (vat != propertyOwner.Vat)
@@ -69,6 +89,11 @@ public class PropertyOwnerService
 
     public async Task<IActionResult> Delete(string vat)
     {
+        if (OwnerValidator.VatIsNotValid(vat))
+        {
+            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
+        }
+
         return await _propertyOwnerRepository.Delete(vat)
             ? new NoContentResult()
             : new NotFoundObjectResult($"There is no property owner with vat {vat}.");
