@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechnicoWebApplication.Models;
-public enum RepairStatus
+namespace TechnicoWebApplication.Enums;
+public enum TypeOfRepair
 {
-    Pending, InProgress, Complete
+    Painting, Insulation, Frames, Plumbing, ElectricalWork
 }

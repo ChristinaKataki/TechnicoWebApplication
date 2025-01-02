@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TechnicoWebApplication.Enums;
 
 namespace TechnicoWebApplication.Models;
 public class Repair : IEntity<long>

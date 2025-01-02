@@ -1,4 +1,4 @@
-﻿using TechnicoWebApplication.Models;
+﻿using TechnicoWebApplication.Enums;
 
 namespace TechnicoWebApplication.Dtos;
 public class PropertyItemResponseDto

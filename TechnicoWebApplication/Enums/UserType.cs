@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechnicoWebApplication.Models;
+namespace TechnicoWebApplication.Enums;
 public enum UserType
 {
     User, Admin

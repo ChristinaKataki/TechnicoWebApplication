@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Enums;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Mappers;
