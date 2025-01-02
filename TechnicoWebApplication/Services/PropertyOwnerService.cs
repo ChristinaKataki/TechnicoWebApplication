@@ -38,6 +38,11 @@ public class PropertyOwnerService
             return new ConflictObjectResult($"Property owner with vat {propertyOwner.Vat} already exists.");
         }
 
+        if (await _propertyOwnerRepository.ReadByEmail(propertyOwner.Email) != null)
+        {
+            return new ConflictObjectResult($"Email {propertyOwner.Email} has already been used.");
+        }
+
         PropertyOwner createdPropertyOwner = await _propertyOwnerRepository.Create(propertyOwner);
         PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(createdPropertyOwner);
         return new OkObjectResult(propertyOwnerResponseDto);
