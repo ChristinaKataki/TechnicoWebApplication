@@ -111,5 +111,11 @@ public class RepairService
             ? new NoContentResult()
             : new NotFoundObjectResult($"There is no repair with id {id}.");
     }
+
+    public async Task<string?> GetOwnerOfRepair(long id)
+    {
+        Repair? repair= await _repairRepository.Read(id);
+        return repair?.PropertyOwner?.Vat;
+    }
 }
 

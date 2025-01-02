@@ -119,5 +119,11 @@ public class PropertyItemService
             ? new NoContentResult()
             : new NotFoundObjectResult($"There is no property item with id {id}.");
     }
+
+    public async Task<string?> GetOwnerOfItem(string id)
+    {
+        PropertyItem? propertyItem = await _propertyItemRepository.Read(id);
+        return propertyItem?.PropertyOwner?.Vat;
+    }
 }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Dtos;
@@ -6,6 +7,10 @@ using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
 using TechnicoWebApplication.Validators;
+using Microsoft.AspNetCore.Http;
+using NuGet.Common;
+using TechnicoWebApplication.Helpers;
+using System.Security.Claims;
 
 namespace TechnicoWebApplication.Services;
 public class PropertyOwnerService
@@ -54,6 +59,29 @@ public class PropertyOwnerService
         PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(propertyOwner);
 
         return new OkObjectResult(propertyOwnerResponseDto);
+    }
+
+    public async Task<ActionResult<PropertyOwnerLoginResponseDto>> ReadByEmailAndPassword(string email, string password)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            return new BadRequestObjectResult("Email and password are required.");
+        }
+
+        PropertyOwner? propertyOwner = await _propertyOwnerRepository.ReadByEmailAndPassword(email, password);
+        if (propertyOwner == null)
+        {
+            return new UnauthorizedObjectResult("Invalid credentials.");
+        }
+
+        PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(propertyOwner);
+
+        return new OkObjectResult(new PropertyOwnerLoginResponseDto
+        {
+            Token = TokenProvider.Create(propertyOwner),
+            PropertyOwner = propertyOwnerResponseDto,
+            UserType = propertyOwner.UserType
+        });
     }
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)

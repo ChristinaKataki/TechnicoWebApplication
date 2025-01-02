@@ -26,7 +26,7 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
 
     public async Task<bool> Delete(string id)
     {
-        PropertyOwner? propertyOwner = _dbContext.PropertyOwners.Find(id);
+        PropertyOwner? propertyOwner = await _dbContext.PropertyOwners.FindAsync(id);
 
         if (propertyOwner == null)
         {
@@ -62,5 +62,12 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
         await _dbContext.SaveChangesAsync();
 
         return existingOwner;
+    }
+
+    public async Task<PropertyOwner?> ReadByEmailAndPassword(string email, string password)
+    {
+        return await _dbContext.PropertyOwners
+            .Where(owner => owner.Email == email && owner.Password == password)
+            .FirstOrDefaultAsync();
     }
 }
