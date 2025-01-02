@@ -68,20 +68,16 @@ public class PropertyOwnerService
             return new BadRequestObjectResult("Email and password are required.");
         }
 
-        PropertyOwner? propertyOwner = await _propertyOwnerRepository.ReadByEmailAndPassword(email, password);
-        if (propertyOwner == null)
+        PropertyOwner? propertyOwner = await _propertyOwnerRepository.ReadByEmail(email);
+        if (propertyOwner == null || !BCrypt.Net.BCrypt.Verify(password, propertyOwner.Password))
         {
             return new UnauthorizedObjectResult("Invalid credentials.");
         }
 
-        PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(propertyOwner);
+        string jwtToken = TokenProvider.Create(propertyOwner);
+        PropertyOwnerLoginResponseDto propertyOwnerLoginResponseDto = _propertyOwnerMapper.GetPropertyOwnerLoginResponseDto(propertyOwner, jwtToken);
 
-        return new OkObjectResult(new PropertyOwnerLoginResponseDto
-        {
-            Token = TokenProvider.Create(propertyOwner),
-            PropertyOwner = propertyOwnerResponseDto,
-            UserType = propertyOwner.UserType
-        });
+        return new OkObjectResult(propertyOwnerLoginResponseDto);
     }
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)

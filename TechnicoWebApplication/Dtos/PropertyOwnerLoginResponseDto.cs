@@ -7,10 +7,9 @@ using TechnicoWebApplication.Enums;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Dtos;
-public class PropertyOwnerLoginResponseDto
+public class PropertyOwnerLoginResponseDto : PropertyOwnerResponseDto
 {
     public required string Token { get; set; }
-    public required PropertyOwnerResponseDto PropertyOwner { get; set; }
 
     public required UserType UserType { get; set; }
 }

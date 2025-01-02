@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.Scripting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ public class PropertyOwnerMapper
             Address = propertyOwnerRequestDto.Address,
             PhoneNumber = propertyOwnerRequestDto.PhoneNumber,
             Email = propertyOwnerRequestDto.Email,
-            Password = propertyOwnerRequestDto.Password,
+            Password = BCrypt.Net.BCrypt.HashPassword(propertyOwnerRequestDto.Password),
             UserType = UserType.User,
             PropertyItems = []
         };
@@ -36,6 +37,21 @@ public class PropertyOwnerMapper
             Address = propertyOwner.Address,
             PhoneNumber = propertyOwner.PhoneNumber,
             Email = propertyOwner.Email,
+        };
+    }
+
+    public PropertyOwnerLoginResponseDto GetPropertyOwnerLoginResponseDto(PropertyOwner propertyOwner, string token)
+    {
+        return new PropertyOwnerLoginResponseDto
+        {
+            Vat = propertyOwner.Vat,
+            Name = propertyOwner.Name,
+            Surname = propertyOwner.Surname,
+            Address = propertyOwner.Address,
+            PhoneNumber = propertyOwner.PhoneNumber,
+            Email = propertyOwner.Email,
+            UserType = propertyOwner.UserType,
+            Token = token
         };
     }
 }

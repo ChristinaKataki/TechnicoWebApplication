@@ -64,10 +64,10 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
         return existingOwner;
     }
 
-    public async Task<PropertyOwner?> ReadByEmailAndPassword(string email, string password)
+    public async Task<PropertyOwner?> ReadByEmail(string email)
     {
         return await _dbContext.PropertyOwners
-            .Where(owner => owner.Email == email && owner.Password == password)
+            .Where(owner => owner.Email == email)
             .FirstOrDefaultAsync();
     }
 }
