@@ -119,5 +119,18 @@ namespace TechnicoWebApplication.Controllers
             var response = await _propertyOwnerService.ReadByEmailAndPassword(propertyOwnerLoginRequestDto.Email, propertyOwnerLoginRequestDto.Password);
             return response;
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Search([FromQuery] PropertyOwnerFilters properyOwnerFilters)
+        {
+            if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
+            {
+                return Forbid();
+            }
+
+            var response = await _propertyOwnerService.Search(properyOwnerFilters);
+            return response;
+        }
     }
 }

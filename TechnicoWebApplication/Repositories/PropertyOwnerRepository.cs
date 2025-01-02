@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Context;
+using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
@@ -69,5 +71,35 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
         return await _dbContext.PropertyOwners
             .Where(owner => owner.Email == email)
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<IActionResult> ReadWithFilters(PropertyOwnerFilters filters)
+    {
+        var query = _dbContext.PropertyOwners.AsQueryable();
+
+        if (!string.IsNullOrEmpty(filters.Email))
+        {
+            query = query.Where(owner => owner.Email.Contains(filters.Email));
+        }
+
+        if (!string.IsNullOrEmpty(filters.Vat))
+        {
+            query = query.Where(owner => owner.Vat == filters.Vat);
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var elements = await query
+            .Skip((filters.Page - 1) * filters.PageSize)
+            .Take(filters.PageSize)
+            .ToListAsync();
+
+        return new OkObjectResult(new
+        {
+            TotalCount = totalCount,
+            Page = filters.Page,
+            PageSize = filters.PageSize,
+            Elements = elements
+        });
     }
 }

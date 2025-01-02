@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TechnicoWebApplication.Context;
+using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
@@ -66,5 +68,40 @@ public class RepairRepository : IRepository<Repair, long>
         await _dbContext.SaveChangesAsync();
 
         return existingItem;
+    }
+
+    public async Task<IActionResult> ReadWithFilters(RepairFilters filters)
+    {
+        var query = _dbContext.Repairs.AsQueryable();
+
+        if (!string.IsNullOrEmpty(filters.Vat))
+        {
+            query = query.Where(repair => repair.PropertyOwner.Vat == filters.Vat);
+        }
+
+        if (filters.MinDate != null)
+        {
+            query = query.Where(repair => repair.RepairDate >= filters.MinDate);
+        }
+
+        if (filters.MaxDate != null)
+        {
+            query = query.Where(repair => repair.RepairDate <= filters.MaxDate);
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var elements = await query
+            .Skip((filters.Page - 1) * filters.PageSize)
+            .Take(filters.PageSize)
+            .ToListAsync();
+
+        return new OkObjectResult(new
+        {
+            TotalCount = totalCount,
+            Page = filters.Page,
+            PageSize = filters.PageSize,
+            Elements = elements
+        });
     }
 }

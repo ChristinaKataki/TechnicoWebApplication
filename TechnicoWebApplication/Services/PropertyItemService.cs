@@ -125,5 +125,10 @@ public class PropertyItemService
         PropertyItem? propertyItem = await _propertyItemRepository.Read(id);
         return propertyItem?.PropertyOwner?.Vat;
     }
+
+    public async Task<IActionResult> Search(PropertyItemFilters filters)
+    {
+        return await _propertyItemRepository.ReadWithFilters(filters);
+    }
 }
 

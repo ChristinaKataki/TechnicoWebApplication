@@ -117,5 +117,10 @@ public class RepairService
         Repair? repair= await _repairRepository.Read(id);
         return repair?.PropertyOwner?.Vat;
     }
+
+    public async Task<IActionResult> Search(RepairFilters filters)
+    {
+        return await _repairRepository.ReadWithFilters(filters);
+    }
 }
 

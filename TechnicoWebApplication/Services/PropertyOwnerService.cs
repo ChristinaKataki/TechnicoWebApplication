@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using NuGet.Common;
 using TechnicoWebApplication.Helpers;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace TechnicoWebApplication.Services;
 public class PropertyOwnerService
@@ -126,5 +127,10 @@ public class PropertyOwnerService
         return await _propertyOwnerRepository.Delete(vat)
             ? new NoContentResult()
             : new NotFoundObjectResult($"There is no property owner with vat {vat}.");
+    }
+
+    public async Task<IActionResult> Search(PropertyOwnerFilters filters)
+    {
+        return await _propertyOwnerRepository.ReadWithFilters(filters);
     }
 }

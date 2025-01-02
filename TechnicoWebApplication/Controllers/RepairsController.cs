@@ -84,5 +84,18 @@ namespace TechnicoWebApplication.Controllers
             var response = await _repairService.Delete(id);
             return response;
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Search([FromQuery] RepairFilters repairFilters)
+        {
+            if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
+            {
+                repairFilters.Vat = User.FindFirst("vat")?.Value;
+            }
+
+            var response = await _repairService.Search(repairFilters);
+            return response;
+        }
     }
 }

@@ -84,5 +84,18 @@ namespace TechnicoWebApplication.Controllers
             var response = await _propertyItemService.Delete(id);
             return response;
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Search([FromQuery] PropertyItemFilters propertyItemFilters)
+        {
+            if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
+            {
+                return Forbid();
+            }
+
+            var response = await _propertyItemService.Search(propertyItemFilters);
+            return response;
+        }
     }
 }
