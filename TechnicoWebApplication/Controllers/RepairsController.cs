@@ -70,7 +70,7 @@ namespace TechnicoWebApplication.Controllers
         // DELETE
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteRepair(long id)
+        public async Task<IActionResult> DeleteRepair(long id, [FromQuery] bool permanent = false)
         {
             if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -81,7 +81,9 @@ namespace TechnicoWebApplication.Controllers
                 }
             }
 
-            var response = await _repairService.Delete(id);
+            var response = await (permanent
+                ? _repairService.Delete(id)
+                : _repairService.SoftDelete(id));
             return response;
         }
 

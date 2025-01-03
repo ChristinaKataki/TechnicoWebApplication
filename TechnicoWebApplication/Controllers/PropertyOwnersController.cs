@@ -102,14 +102,16 @@ namespace TechnicoWebApplication.Controllers
         // DELETE
         [HttpDelete("{vat}")]
         [Authorize]
-        public async Task<IActionResult> DeletePropertyOwner(string vat)
+        public async Task<IActionResult> DeletePropertyOwner(string vat, [FromQuery] bool permanent = false)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
                 return Forbid();
             }
 
-            var response = await _propertyOwnerService.Delete(vat);
+            var response = await (permanent
+                ? _propertyOwnerService.Delete(vat)
+                : _propertyOwnerService.SoftDelete(vat));
             return response;
         }
 

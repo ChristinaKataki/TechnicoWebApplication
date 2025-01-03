@@ -70,7 +70,7 @@ namespace TechnicoWebApplication.Controllers
         // DELETE
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeletePropertyItem(string id)
+        public async Task<IActionResult> DeletePropertyItem(string id, [FromQuery] bool permanent = false)
         {
             if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -81,7 +81,9 @@ namespace TechnicoWebApplication.Controllers
                 }
             }
 
-            var response = await _propertyItemService.Delete(id);
+            var response = await (permanent
+                ? _propertyItemService.Delete(id)
+                : _propertyItemService.SoftDelete(id));
             return response;
         }
 

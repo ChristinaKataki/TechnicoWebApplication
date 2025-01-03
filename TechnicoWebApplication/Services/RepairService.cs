@@ -112,6 +112,22 @@ public class RepairService
             : new NotFoundObjectResult($"There is no repair with id {id}.");
     }
 
+    public async Task<IActionResult> SoftDelete(long id)
+    {
+
+        Repair? repair = await _repairRepository.Read(id);
+        if (repair == null)
+        {
+            return new NotFoundObjectResult($"There is no repair with id {id}.");
+        }
+
+        repair.IsDeleted = true;
+
+        await _repairRepository.Update(id, repair);
+
+        return new NoContentResult();
+    }
+
     public async Task<string?> GetOwnerOfRepair(long id)
     {
         Repair? repair= await _repairRepository.Read(id);

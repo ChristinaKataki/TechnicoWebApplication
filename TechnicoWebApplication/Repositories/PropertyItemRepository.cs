@@ -24,7 +24,7 @@ public class PropertyItemRepository : IRepository<PropertyItem, string>
 
     public async Task<bool> Delete(string id)
     {
-        PropertyItem? propertyItem = _dbContext.PropertyItems.Find(id);
+        PropertyItem? propertyItem = await _dbContext.PropertyItems.FindAsync(id);
 
         if (propertyItem == null)
         {

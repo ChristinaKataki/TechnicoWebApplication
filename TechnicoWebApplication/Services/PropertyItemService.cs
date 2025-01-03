@@ -120,6 +120,22 @@ public class PropertyItemService
             : new NotFoundObjectResult($"There is no property item with id {id}.");
     }
 
+    public async Task<IActionResult> SoftDelete(string id)
+    {
+
+        PropertyItem? propertyItem = await _propertyItemRepository.Read(id);
+        if (propertyItem == null)
+        {
+            return new NotFoundObjectResult($"There is no property item with id {id}.");
+        }
+
+        propertyItem.IsDeleted = true;
+
+        await _propertyItemRepository.Update(id, propertyItem);
+
+        return new NoContentResult();
+    }
+
     public async Task<string?> GetOwnerOfItem(string id)
     {
         PropertyItem? propertyItem = await _propertyItemRepository.Read(id);

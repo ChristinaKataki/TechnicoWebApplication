@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TechnicoWebApplication.Enums;
 
 namespace TechnicoWebApplication.Models;
-public class PropertyItem : IEntity<string>
+public class PropertyItem : SoftDeletableEntity
 {
     public required string Id { get; set; }
     public string? Address { get; set; } 

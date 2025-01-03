@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TechnicoWebApplication.Enums;
 
 namespace TechnicoWebApplication.Models;
-public class Repair : IEntity<long>
+public class Repair : SoftDeletableEntity
 {
     public long Id { get; set; }
     public DateTime RepairDate { get; set; }

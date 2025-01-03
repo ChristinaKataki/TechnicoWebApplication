@@ -40,6 +40,15 @@ public class TechnicoDbContext : DbContext
         modelBuilder.Entity<Repair>()
          .Property(p => p.TypeOfRepair)
          .HasConversion<string>();
+
+        modelBuilder.Entity<PropertyItem>()
+            .HasQueryFilter(p => !p.IsDeleted);
+
+        modelBuilder.Entity<PropertyOwner>()
+            .HasQueryFilter(p => !p.IsDeleted);
+
+        modelBuilder.Entity<Repair>()
+            .HasQueryFilter(p => !p.IsDeleted);
     }
 }
 

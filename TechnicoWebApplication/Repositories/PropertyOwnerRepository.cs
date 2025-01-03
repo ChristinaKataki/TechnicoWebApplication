@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,13 +29,18 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
 
     public async Task<bool> Delete(string id)
     {
-        PropertyOwner? propertyOwner = await _dbContext.PropertyOwners.FindAsync(id);
+        PropertyOwner? propertyOwner = await _dbContext.PropertyOwners
+        .Include(p => p.PropertyItems)
+        .Include(p => p.Repairs)
+        .FirstOrDefaultAsync(p => p.Vat == id);
 
         if (propertyOwner == null)
         {
             return false;
         }
 
+        _dbContext.PropertyItems.RemoveRange(propertyOwner.PropertyItems);
+        _dbContext.Repairs.RemoveRange(propertyOwner.Repairs);
         _dbContext.PropertyOwners.Remove(propertyOwner);
         await _dbContext.SaveChangesAsync();
         return true;
@@ -42,7 +48,10 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
 
     public async Task<PropertyOwner?> Read(string id)
     {
-        return await _dbContext.PropertyOwners.FindAsync(id);
+        return await _dbContext.PropertyOwners
+            .Include(owner => owner.PropertyItems)
+            .Include(owner => owner.Repairs)
+            .FirstOrDefaultAsync(owner => owner.Vat == id);
     }
 
     public Task<List<PropertyOwner>> Read()

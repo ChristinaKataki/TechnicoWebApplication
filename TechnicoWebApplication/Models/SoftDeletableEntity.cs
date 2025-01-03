@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TechnicoWebApplication.Models;
-public interface IEntity<K>
+public abstract class SoftDeletableEntity
 {
-    K Id { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

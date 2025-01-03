@@ -129,6 +129,24 @@ public class PropertyOwnerService
             : new NotFoundObjectResult($"There is no property owner with vat {vat}.");
     }
 
+    public async Task<IActionResult> SoftDelete(string vat)
+    {
+
+        PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
+        if (propertyOwner == null)
+        {
+            return new NotFoundObjectResult($"There is no property owner with vat {vat}.");
+        }
+
+        propertyOwner.IsDeleted = true;
+        propertyOwner.PropertyItems.ForEach(item => item.IsDeleted = true);
+        propertyOwner.Repairs.ForEach(repair => repair.IsDeleted = true);
+
+        await _propertyOwnerRepository.Update(vat, propertyOwner);
+
+        return new NoContentResult();
+    }
+
     public async Task<IActionResult> Search(PropertyOwnerFilters filters)
     {
         return await _propertyOwnerRepository.ReadWithFilters(filters);

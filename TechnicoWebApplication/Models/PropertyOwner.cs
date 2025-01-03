@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using TechnicoWebApplication.Enums;
 
 namespace TechnicoWebApplication.Models;
-public class PropertyOwner
+public class PropertyOwner : SoftDeletableEntity
 {
     [Key]
     public required string Vat { get; set; }
@@ -19,4 +19,5 @@ public class PropertyOwner
     public required string Password { get; set; }
     public UserType UserType { get; set; }
     public List<PropertyItem> PropertyItems { get; set; } = [];
+    public List<Repair> Repairs { get; set; } = [];
 }
