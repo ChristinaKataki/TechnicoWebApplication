@@ -11,7 +11,7 @@ using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
-public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
+public class PropertyOwnerRepository : IRepository<PropertyOwner, string, PropertyOwnerFilters>
 {
     private readonly TechnicoDbContext _dbContext;
 
@@ -52,11 +52,6 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string>
             .Include(owner => owner.PropertyItems)
             .Include(owner => owner.Repairs)
             .FirstOrDefaultAsync(owner => owner.Vat == id);
-    }
-
-    public Task<List<PropertyOwner>> Read()
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<PropertyOwner?> Update(string id, PropertyOwner propertyOwner)

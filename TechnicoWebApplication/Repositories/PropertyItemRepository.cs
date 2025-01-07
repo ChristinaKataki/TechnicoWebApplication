@@ -6,7 +6,7 @@ using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
 
-public class PropertyItemRepository : IRepository<PropertyItem, string>
+public class PropertyItemRepository : IRepository<PropertyItem, string, PropertyItemFilters>
 {
     private readonly TechnicoDbContext _dbContext;
 
@@ -48,11 +48,6 @@ public class PropertyItemRepository : IRepository<PropertyItem, string>
         return await _dbContext.PropertyItems
             .Where(item => item.PropertyOwner.Vat == vat)
             .ToListAsync();
-    }
-
-    public Task<List<PropertyItem>> Read()
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<PropertyItem?> Update(string id, PropertyItem propertyItem)

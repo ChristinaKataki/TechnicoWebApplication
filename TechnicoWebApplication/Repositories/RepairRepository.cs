@@ -5,7 +5,7 @@ using TechnicoWebApplication.Dtos;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
-public class RepairRepository : IRepository<Repair, long>
+public class RepairRepository : IRepository<Repair, long, RepairFilters>
 {
     private readonly TechnicoDbContext _dbContext;
 
@@ -47,11 +47,6 @@ public class RepairRepository : IRepository<Repair, long>
         return await _dbContext.Repairs
             .Where(repair => repair.PropertyOwner.Vat == vat)
             .ToListAsync();
-    }
-
-    public Task<List<Repair>> Read()
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<Repair?> Update(long id, Repair repair)
