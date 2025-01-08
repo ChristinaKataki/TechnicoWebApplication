@@ -38,14 +38,14 @@ public class RepairRepository : IRepository<Repair, long, RepairFilters>
     public async Task<Repair?> Read(long id)
     {
         return await _dbContext.Repairs
-            .Include(repair => repair.PropertyOwner)
+            .Include(repair => repair.PropertyItem.PropertyOwner)
             .FirstOrDefaultAsync(repair => repair.Id == id);
     }
 
     public async Task<List<Repair>> FindByOwner(string vat)
     {
         return await _dbContext.Repairs
-            .Where(repair => repair.PropertyOwner.Vat == vat)
+            .Where(repair => repair.PropertyItem.PropertyOwner.Vat == vat)
             .ToListAsync();
     }
 
@@ -71,7 +71,7 @@ public class RepairRepository : IRepository<Repair, long, RepairFilters>
 
         if (!string.IsNullOrEmpty(filters.Vat))
         {
-            query = query.Where(repair => repair.PropertyOwner.Vat == filters.Vat);
+            query = query.Where(repair => repair.PropertyItem.PropertyOwner.Vat == filters.Vat);
         }
 
         if (filters.MinDate != null)

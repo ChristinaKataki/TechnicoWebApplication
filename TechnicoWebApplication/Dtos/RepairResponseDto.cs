@@ -4,6 +4,7 @@ namespace TechnicoWebApplication.Dtos;
 public class RepairResponseDto
 {
     public required string Vat { get; set; }
+    public required string PropertyItemId { get; set; }
     public long Id { get; set; }
     public DateTime RepairDate { get; set; }
     public TypeOfRepair TypeOfRepair { get; set; }

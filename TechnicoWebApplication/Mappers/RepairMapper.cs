@@ -4,7 +4,7 @@ using TechnicoWebApplication.Models;
 namespace TechnicoWebApplication.Mappers;
 public class RepairMapper
 {
-    public Repair GetRepairModel(RepairRequestDto repairRequestDto, PropertyOwner propertyOwner)
+    public Repair GetRepairModel(RepairRequestDto repairRequestDto, PropertyItem propertyItem)
     {
         return new Repair
         {
@@ -14,7 +14,7 @@ public class RepairMapper
             Status = repairRequestDto.Status, 
             RepairDate = repairRequestDto.RepairDate,
             TypeOfRepair = repairRequestDto.TypeOfRepair,
-            PropertyOwner = propertyOwner
+            PropertyItem = propertyItem
         };
     }
 
@@ -29,7 +29,8 @@ public class RepairMapper
             Status = repair.Status,
             RepairDate = repair.RepairDate,
             TypeOfRepair = repair.TypeOfRepair,
-            Vat = repair.PropertyOwner.Vat
+            PropertyItemId = repair.PropertyItem.Id,
+            Vat = repair.PropertyItem.PropertyOwner.Vat
         };
     }
 }

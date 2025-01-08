@@ -11,10 +11,12 @@ namespace TechnicoWebApplication.Controllers
     public class RepairsController : ControllerBase
     {
         private readonly RepairService _repairService;
+        private readonly PropertyItemService _propertyItemService;
 
-        public RepairsController(RepairService repairService)
+        public RepairsController(RepairService repairService, PropertyItemService propertyItemService)
         {
             _repairService = repairService;
+            _propertyItemService = propertyItemService;
         }
 
         // CREATE
@@ -22,9 +24,13 @@ namespace TechnicoWebApplication.Controllers
         [Authorize]
         public async Task<ActionResult<RepairResponseDto>> PostRepair(RepairRequestDto repairRequestDto)
         {
-            if (User.FindFirst("vat")?.Value != repairRequestDto.Vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
+            if (User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
-                return Forbid();
+                string? vat = await _propertyItemService.GetOwnerOfItem(repairRequestDto.PropertyItemId);
+                if (vat != null && User.FindFirst("vat")?.Value != vat)
+                {
+                    return Forbid();
+                }
             }
 
             var response = await _repairService.Create(repairRequestDto);

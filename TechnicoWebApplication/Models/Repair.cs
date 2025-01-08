@@ -12,8 +12,8 @@ public class Repair : SoftDeletableEntity
     public DateTime RepairDate { get; set; }
     public TypeOfRepair TypeOfRepair { get; set; }
     public string? Description { get; set; }
-    public string? Address { get; set; } ///TODO
+    public string? Address { get; set; } 
     public RepairStatus Status { get; set; }
     public float Cost { get; set; }
-    public required PropertyOwner PropertyOwner { get; set; }
+    public required PropertyItem PropertyItem { get; set; }
 }

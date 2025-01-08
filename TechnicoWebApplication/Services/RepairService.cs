@@ -16,28 +16,25 @@ public class RepairService
     private readonly RepairRepository _repairRepository;
     private readonly RepairMapper _repairMapper;
     private readonly PropertyOwnerRepository _propertyOwnerRepository;
+    private readonly PropertyItemRepository _propertyItemRepository;
 
-    public RepairService(RepairRepository repairRepository, PropertyOwnerRepository propertyOwnerRepository)
+    public RepairService(RepairRepository repairRepository, PropertyOwnerRepository propertyOwnerRepository, PropertyItemRepository propertyItemRepository)
     {
         _repairRepository = repairRepository;
         _repairMapper = new RepairMapper();
         _propertyOwnerRepository = propertyOwnerRepository;
+        _propertyItemRepository = propertyItemRepository;
     }
 
     public async Task<ActionResult<RepairResponseDto>> Create(RepairRequestDto repairRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(repairRequestDto.Vat))
+        PropertyItem? propertyItem = await _propertyItemRepository.Read(repairRequestDto.PropertyItemId);
+        if (propertyItem == null)
         {
-            return new BadRequestObjectResult($"The Vat [{repairRequestDto.Vat}] is not valid.");
+            return new NotFoundObjectResult($"There is no property with the provided Id ({repairRequestDto.PropertyItemId}).");
         }
 
-        PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(repairRequestDto.Vat);
-        if (propertyOwner == null)
-        {
-            return new NotFoundObjectResult($"There is no owner with the provided vat ({repairRequestDto.Vat}).");
-        }
-
-        Repair repair = _repairMapper.GetRepairModel(repairRequestDto, propertyOwner);
+        Repair repair = _repairMapper.GetRepairModel(repairRequestDto, propertyItem);
 
         Repair createdRepair = await _repairRepository.Create(repair);
         RepairResponseDto repairResponseDto = _repairMapper.GetRepairDto(createdRepair);
@@ -79,18 +76,13 @@ public class RepairService
 
     public async Task<ActionResult<RepairResponseDto>> Update(long id, RepairRequestDto repairRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(repairRequestDto.Vat))
+        PropertyItem? propertyItem = await _propertyItemRepository.Read(repairRequestDto.PropertyItemId);
+        if (propertyItem == null)
         {
-            return new BadRequestObjectResult($"The Vat [{repairRequestDto.Vat}] is not valid.");
+            return new NotFoundObjectResult($"There is no property with the provided Id ({repairRequestDto.PropertyItemId}).");
         }
 
-        PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(repairRequestDto.Vat);
-        if (propertyOwner == null)
-        {
-            return new NotFoundObjectResult($"There is no owner with the provided vat ({repairRequestDto.Vat}).");
-        }
-
-        Repair repair = _repairMapper.GetRepairModel(repairRequestDto, propertyOwner);
+        Repair repair = _repairMapper.GetRepairModel(repairRequestDto, propertyItem);
         repair.Id = id;
 
         Repair? updatedRepair = await _repairRepository.Update(id, repair);
@@ -131,7 +123,7 @@ public class RepairService
     public async Task<string?> GetOwnerOfRepair(long id)
     {
         Repair? repair= await _repairRepository.Read(id);
-        return repair?.PropertyOwner?.Vat;
+        return repair?.PropertyItem?.PropertyOwner?.Vat;
     }
 
     public async Task<IActionResult> Search(RepairFilters filters)
