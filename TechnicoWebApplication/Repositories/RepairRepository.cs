@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TechnicoWebApplication.Context;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Helpers;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
@@ -51,21 +52,24 @@ public class RepairRepository : IRepository<Repair, long, RepairFilters>
 
     public async Task<Repair?> Update(long id, Repair repair)
     {
-        var existingItem = await _dbContext.Repairs.FindAsync(id);
+        var existingRepair = await _dbContext.Repairs
+            .Include(repair => repair.PropertyItem.PropertyOwner)
+            .FirstOrDefaultAsync(repair => repair.Id == id);
 
-        if (existingItem == null)
+        if (existingRepair == null)
         {
             return null;
         }
 
-        _dbContext.Entry(existingItem).CurrentValues.SetValues(repair);
+        _dbContext.Entry(existingRepair).CurrentValues.SetValues(repair);
+        existingRepair.PropertyItem = repair.PropertyItem;
 
         await _dbContext.SaveChangesAsync();
 
-        return existingItem;
+        return existingRepair;
     }
 
-    public async Task<IActionResult> ReadWithFilters(RepairFilters filters)
+    public async Task<PageResults<Repair>> ReadWithFilters(RepairFilters filters)
     {
         var query = _dbContext.Repairs.AsQueryable();
 
@@ -89,14 +93,15 @@ public class RepairRepository : IRepository<Repair, long, RepairFilters>
         var elements = await query
             .Skip((filters.Page - 1) * filters.PageSize)
             .Take(filters.PageSize)
+            .Include(repair => repair.PropertyItem.PropertyOwner)
             .ToListAsync();
 
-        return new OkObjectResult(new
+        return new PageResults<Repair>
         {
             TotalCount = totalCount,
             Page = filters.Page,
             PageSize = filters.PageSize,
             Elements = elements
-        });
+        };
     }
 }

@@ -13,4 +13,5 @@ public class PropertyItem : SoftDeletableEntity
     public int ConstructionYear { get; set; }
     public PropertyType PropertyType { get; set; }
     public required PropertyOwner PropertyOwner { get; set; }
+    public List<Repair> Repairs { get; set; } = [];
 }

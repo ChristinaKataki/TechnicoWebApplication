@@ -17,6 +17,7 @@ using TechnicoWebApplication.Helpers;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using TechnicoWebApplication.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace TechnicoWebApplication.Controllers
 {
@@ -46,7 +47,7 @@ namespace TechnicoWebApplication.Controllers
         // GET
         [HttpGet("{vat}")]
         [Authorize]
-        public async Task<ActionResult<PropertyOwnerResponseDto>> GetPropertyOwner(string vat)
+        public async Task<ActionResult<PropertyOwnerResponseDto>> GetPropertyOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -60,7 +61,7 @@ namespace TechnicoWebApplication.Controllers
         // GET
         [HttpGet("{vat}/PropertyItems")]
         [Authorize]
-        public async Task<ActionResult<List<PropertyItemResponseDto>>> GetItemsOfOwner(string vat)
+        public async Task<ActionResult<List<PropertyItemResponseDto>>> GetItemsOfOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -74,7 +75,7 @@ namespace TechnicoWebApplication.Controllers
         // GET
         [HttpGet("{vat}/Repairs")]
         [Authorize]
-        public async Task<ActionResult<List<RepairResponseDto>>> GetRepairsOfOwner(string vat)
+        public async Task<ActionResult<List<RepairResponseDto>>> GetRepairsOfOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -88,7 +89,7 @@ namespace TechnicoWebApplication.Controllers
         // PUT
         [HttpPut("{vat}")]
         [Authorize]
-        public async Task<ActionResult<PropertyOwnerResponseDto>> PutPropertyOwner(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
+        public async Task<ActionResult<PropertyOwnerResponseDto>> PutPropertyOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
@@ -102,7 +103,7 @@ namespace TechnicoWebApplication.Controllers
         // DELETE
         [HttpDelete("{vat}")]
         [Authorize]
-        public async Task<IActionResult> DeletePropertyOwner(string vat, [FromQuery] bool permanent = false)
+        public async Task<IActionResult> DeletePropertyOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat, [FromQuery] bool permanent = false)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {

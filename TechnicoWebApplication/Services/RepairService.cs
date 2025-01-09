@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Helpers;
 using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
@@ -57,11 +58,6 @@ public class RepairService
 
     public async Task<ActionResult<List<RepairResponseDto>>> FindByOwner(string vat)
     {
-        if (OwnerValidator.VatIsNotValid(vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
-        }
-
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
         {
@@ -128,7 +124,15 @@ public class RepairService
 
     public async Task<IActionResult> Search(RepairFilters filters)
     {
-        return await _repairRepository.ReadWithFilters(filters);
+        PageResults<Repair> results = await _repairRepository.ReadWithFilters(filters);
+
+        return new OkObjectResult(new PageResults<RepairResponseDto>
+        {
+            TotalCount = results.TotalCount,
+            Page = results.Page,
+            PageSize = filters.PageSize,
+            Elements = results.Elements.ConvertAll(repair => _repairMapper.GetRepairDto(repair))
+        });
     }
 }
 

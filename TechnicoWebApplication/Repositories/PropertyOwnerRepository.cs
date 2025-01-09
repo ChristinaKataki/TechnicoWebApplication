@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Context;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Helpers;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
@@ -29,18 +30,13 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
 
     public async Task<bool> Delete(string id)
     {
-        PropertyOwner? propertyOwner = await _dbContext.PropertyOwners
-        .Include(p => p.PropertyItems)
-        .Include(p => p.Repairs)
-        .FirstOrDefaultAsync(p => p.Vat == id);
+        PropertyOwner? propertyOwner = await _dbContext.PropertyOwners.FindAsync(id);
 
         if (propertyOwner == null)
         {
             return false;
         }
 
-        _dbContext.PropertyItems.RemoveRange(propertyOwner.PropertyItems);
-        _dbContext.Repairs.RemoveRange(propertyOwner.Repairs);
         _dbContext.PropertyOwners.Remove(propertyOwner);
         await _dbContext.SaveChangesAsync();
         return true;
@@ -50,7 +46,7 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
     {
         return await _dbContext.PropertyOwners
             .Include(owner => owner.PropertyItems)
-            .Include(owner => owner.Repairs)
+            .ThenInclude(item => item.Repairs)
             .FirstOrDefaultAsync(owner => owner.Vat == id);
     }
 
@@ -77,7 +73,7 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IActionResult> ReadWithFilters(PropertyOwnerFilters filters)
+    public async Task<PageResults<PropertyOwner>> ReadWithFilters(PropertyOwnerFilters filters)
     {
         var query = _dbContext.PropertyOwners.AsQueryable();
 
@@ -96,14 +92,15 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
         var elements = await query
             .Skip((filters.Page - 1) * filters.PageSize)
             .Take(filters.PageSize)
+            .Include(owner => owner.PropertyItems)
             .ToListAsync();
 
-        return new OkObjectResult(new
+        return new PageResults<PropertyOwner> 
         {
             TotalCount = totalCount,
             Page = filters.Page,
             PageSize = filters.PageSize,
             Elements = elements
-        });
+        };
     }
 }

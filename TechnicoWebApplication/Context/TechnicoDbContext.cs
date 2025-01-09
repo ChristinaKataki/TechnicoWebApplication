@@ -49,6 +49,16 @@ public class TechnicoDbContext : DbContext
 
         modelBuilder.Entity<Repair>()
             .HasQueryFilter(p => !p.IsDeleted);
+
+        modelBuilder.Entity<PropertyOwner>()
+            .HasMany(owner => owner.PropertyItems)
+            .WithOne(item => item.PropertyOwner)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PropertyItem>()
+            .HasMany(item => item.Repairs)
+            .WithOne(repair => repair.PropertyItem)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 

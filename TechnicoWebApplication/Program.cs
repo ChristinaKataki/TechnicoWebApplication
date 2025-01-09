@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +9,7 @@ using System.Text;
 using TechnicoWebApplication.Context;
 using TechnicoWebApplication.Repositories;
 using TechnicoWebApplication.Services;
+using TechnicoWebApplication.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+
 builder.Services.AddDbContext<TechnicoDbContext>();
 builder.Services.AddScoped<PropertyOwnerService>();
 builder.Services.AddScoped<PropertyOwnerRepository>();
@@ -30,6 +36,13 @@ builder.Services.AddScoped<PropertyItemService>();
 builder.Services.AddScoped<PropertyItemRepository>();
 builder.Services.AddScoped<RepairService>();
 builder.Services.AddScoped<RepairRepository>();
+builder.Services.AddValidatorsFromAssemblyContaining<OwnerValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<OwnerFiltersValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<PropertyItemValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ItemFiltersValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RepairValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RepairFiltersValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

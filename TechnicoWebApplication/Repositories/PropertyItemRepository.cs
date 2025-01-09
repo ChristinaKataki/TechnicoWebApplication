@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TechnicoWebApplication.Context;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Helpers;
 using TechnicoWebApplication.Models;
 
 namespace TechnicoWebApplication.Repositories;
@@ -40,6 +41,7 @@ public class PropertyItemRepository : IRepository<PropertyItem, string, Property
     {
         return await _dbContext.PropertyItems
             .Include(item => item.PropertyOwner)
+            .Include(item => item.Repairs)
             .FirstOrDefaultAsync(item => item.Id == id);
     }
 
@@ -52,7 +54,10 @@ public class PropertyItemRepository : IRepository<PropertyItem, string, Property
 
     public async Task<PropertyItem?> Update(string id, PropertyItem propertyItem)
     {
-        var existingItem = await _dbContext.PropertyItems.FindAsync(id);
+        var existingItem = await _dbContext.PropertyItems
+            .Include(item => item.PropertyOwner)
+            .Include(item => item.Repairs)
+            .FirstOrDefaultAsync(item => item.Id == id);
 
         if (existingItem == null)
         {
@@ -60,13 +65,14 @@ public class PropertyItemRepository : IRepository<PropertyItem, string, Property
         }
 
         _dbContext.Entry(existingItem).CurrentValues.SetValues(propertyItem);
-
+        existingItem.PropertyOwner = propertyItem.PropertyOwner;
+        
         await _dbContext.SaveChangesAsync();
 
         return existingItem;
     }
 
-    public async Task<IActionResult> ReadWithFilters(PropertyItemFilters filters)
+    public async Task<PageResults<PropertyItem>> ReadWithFilters(PropertyItemFilters filters)
     {
         var query = _dbContext.PropertyItems.AsQueryable();
 
@@ -85,14 +91,16 @@ public class PropertyItemRepository : IRepository<PropertyItem, string, Property
         var elements = await query
             .Skip((filters.Page - 1) * filters.PageSize)
             .Take(filters.PageSize)
+            .Include(item => item.PropertyOwner)
+            .Include(item => item.Repairs)
             .ToListAsync();
 
-        return new OkObjectResult(new
+        return new PageResults<PropertyItem>
         {
             TotalCount = totalCount,
             Page = filters.Page,
             PageSize = filters.PageSize,
             Elements = elements
-        });
+        };
     }
 }

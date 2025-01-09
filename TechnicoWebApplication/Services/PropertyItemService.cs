@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TechnicoWebApplication.Dtos;
+using TechnicoWebApplication.Helpers;
 using TechnicoWebApplication.Mappers;
 using TechnicoWebApplication.Models;
 using TechnicoWebApplication.Repositories;
@@ -26,11 +28,6 @@ public class PropertyItemService
 
     public async Task<ActionResult<PropertyItemResponseDto>> Create(PropertyItemRequestDto propertyItemRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(propertyItemRequestDto.Vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{propertyItemRequestDto.Vat}] is not valid.");
-        }
-
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(propertyItemRequestDto.Vat);
         if (propertyOwner == null)
         {
@@ -65,11 +62,6 @@ public class PropertyItemService
 
     public async Task<ActionResult<List<PropertyItemResponseDto>>> FindByOwner(string vat)
     {
-        if (OwnerValidator.VatIsNotValid(vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
-        }
-
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
         {
@@ -84,10 +76,6 @@ public class PropertyItemService
 
     public async Task<ActionResult<PropertyItemResponseDto>> Update(string id, PropertyItemRequestDto propertyItemRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(propertyItemRequestDto.Vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{propertyItemRequestDto.Vat}] is not valid.");
-        }
         if (id != propertyItemRequestDto.Id)
         {
             return new BadRequestObjectResult($"Item id specified in path ({id}) is different from item id in request body ({propertyItemRequestDto.Id}).");
@@ -130,6 +118,7 @@ public class PropertyItemService
         }
 
         propertyItem.IsDeleted = true;
+        propertyItem.Repairs.ForEach(repair => repair.IsDeleted = true);
 
         await _propertyItemRepository.Update(id, propertyItem);
 
@@ -144,7 +133,15 @@ public class PropertyItemService
 
     public async Task<IActionResult> Search(PropertyItemFilters filters)
     {
-        return await _propertyItemRepository.ReadWithFilters(filters);
+        PageResults<PropertyItem> results = await _propertyItemRepository.ReadWithFilters(filters);
+
+        return new OkObjectResult(new PageResults<PropertyItemResponseDto>
+        {
+            TotalCount = results.TotalCount,
+            Page = results.Page,
+            PageSize = filters.PageSize,
+            Elements = results.Elements.ConvertAll(item => _propertyItemMapper.GetPropertyItemDto(item))
+        });
     }
 }
 

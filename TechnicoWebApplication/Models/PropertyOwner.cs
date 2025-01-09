@@ -19,5 +19,4 @@ public class PropertyOwner : SoftDeletableEntity
     public required string Password { get; set; }
     public UserType UserType { get; set; }
     public List<PropertyItem> PropertyItems { get; set; } = [];
-    public List<Repair> Repairs { get; set; } = [];
 }

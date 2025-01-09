@@ -12,6 +12,8 @@ using NuGet.Common;
 using TechnicoWebApplication.Helpers;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.Results;
+using System.ComponentModel.DataAnnotations;
 
 namespace TechnicoWebApplication.Services;
 public class PropertyOwnerService
@@ -27,11 +29,6 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Create(PropertyOwnerRequestDto propertyOwnerRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(propertyOwnerRequestDto.Vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{propertyOwnerRequestDto.Vat}] is not valid.");
-        }
-
         PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
 
         if (await _propertyOwnerRepository.Read(propertyOwner.Vat) != null)
@@ -51,11 +48,6 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Read(string vat)
     {
-        if (OwnerValidator.VatIsNotValid(vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
-        }
-
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
         if (propertyOwner == null)
         {
@@ -69,11 +61,6 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerLoginResponseDto>> ReadByEmailAndPassword(string email, string password)
     {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            return new BadRequestObjectResult("Email and password are required.");
-        }
-
         PropertyOwner? propertyOwner = await _propertyOwnerRepository.ReadByEmail(email);
         if (propertyOwner == null || !BCrypt.Net.BCrypt.Verify(password, propertyOwner.Password))
         {
@@ -88,16 +75,6 @@ public class PropertyOwnerService
 
     public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
     {
-        if (OwnerValidator.VatIsNotValid(propertyOwnerRequestDto.Vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{propertyOwnerRequestDto.Vat}] is not valid.");
-        }
-
-        if (OwnerValidator.VatIsNotValid(vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
-        }
-
         PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
 
         if (vat != propertyOwner.Vat)
@@ -119,11 +96,6 @@ public class PropertyOwnerService
 
     public async Task<IActionResult> Delete(string vat)
     {
-        if (OwnerValidator.VatIsNotValid(vat))
-        {
-            return new BadRequestObjectResult($"The Vat [{vat}] is not valid.");
-        }
-
         return await _propertyOwnerRepository.Delete(vat)
             ? new NoContentResult()
             : new NotFoundObjectResult($"There is no property owner with vat {vat}.");
@@ -139,8 +111,11 @@ public class PropertyOwnerService
         }
 
         propertyOwner.IsDeleted = true;
-        propertyOwner.PropertyItems.ForEach(item => item.IsDeleted = true);
-        propertyOwner.Repairs.ForEach(repair => repair.IsDeleted = true);
+        propertyOwner.PropertyItems.ForEach(item =>
+        {
+            item.IsDeleted = true;
+            item.Repairs.ForEach(repair => repair.IsDeleted = true);
+        });
 
         await _propertyOwnerRepository.Update(vat, propertyOwner);
 
@@ -149,6 +124,14 @@ public class PropertyOwnerService
 
     public async Task<IActionResult> Search(PropertyOwnerFilters filters)
     {
-        return await _propertyOwnerRepository.ReadWithFilters(filters);
+        PageResults<PropertyOwner> results = await _propertyOwnerRepository.ReadWithFilters(filters);
+
+        return new OkObjectResult(new PageResults<PropertyOwnerResponseDto>
+        {
+            TotalCount = results.TotalCount,
+            Page = results.Page,
+            PageSize = filters.PageSize,
+            Elements = results.Elements.ConvertAll(owner => _propertyOwnerMapper.GetPropertyOwnerDto(owner))
+        });
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechnicoWebApplication.Context;
 
@@ -11,9 +12,11 @@ using TechnicoWebApplication.Context;
 namespace TechnicoWebApplication.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250108204534_M4")]
+    partial class M4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,6 +115,9 @@ namespace TechnicoWebApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("PropertyOwnerVat")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("RepairDate")
                         .HasColumnType("datetime2");
 
@@ -126,6 +132,8 @@ namespace TechnicoWebApplication.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyItemId");
+
+                    b.HasIndex("PropertyOwnerVat");
 
                     b.ToTable("Repairs");
                 });
@@ -144,22 +152,23 @@ namespace TechnicoWebApplication.Migrations
             modelBuilder.Entity("TechnicoWebApplication.Models.Repair", b =>
                 {
                     b.HasOne("TechnicoWebApplication.Models.PropertyItem", "PropertyItem")
-                        .WithMany("Repairs")
+                        .WithMany()
                         .HasForeignKey("PropertyItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PropertyItem");
-                });
+                    b.HasOne("TechnicoWebApplication.Models.PropertyOwner", null)
+                        .WithMany("Repairs")
+                        .HasForeignKey("PropertyOwnerVat");
 
-            modelBuilder.Entity("TechnicoWebApplication.Models.PropertyItem", b =>
-                {
-                    b.Navigation("Repairs");
+                    b.Navigation("PropertyItem");
                 });
 
             modelBuilder.Entity("TechnicoWebApplication.Models.PropertyOwner", b =>
                 {
                     b.Navigation("PropertyItems");
+
+                    b.Navigation("Repairs");
                 });
 #pragma warning restore 612, 618
         }
