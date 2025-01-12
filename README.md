@@ -1,4 +1,4 @@
-# Technico Setup & Usage Guide
+# Setup & Usage Guide
 
 ## 1. Verify .NET 8.0 Installation
 
@@ -127,7 +127,7 @@
 
 ---
 
-## 10. Grant Admin Access to a Property Owner
+## 10. Grant Admin Privileges to a Property Owner
 
 - To make a user an administrator, manually update the `PropertyOwner` record in the database by modifying `UserType` from `User` to `Admin` via your database editor.
 
