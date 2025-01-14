@@ -135,5 +135,13 @@ namespace TechnicoWebApplication.Controllers
             var response = await _propertyOwnerService.Search(properyOwnerFilters);
             return response;
         }
+
+        [HttpPost("me/password-change")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(PropertyOwnerPasswordChangeRequestDto passwordChangeRequestDto)
+        {
+            var response = await _propertyOwnerService.UpdatePassword(User.FindFirst("vat")!.Value, passwordChangeRequestDto);
+            return response;
+        }
     }
 }

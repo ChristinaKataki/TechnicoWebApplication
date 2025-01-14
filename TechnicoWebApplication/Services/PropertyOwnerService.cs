@@ -135,4 +135,20 @@ public class PropertyOwnerService
             Elements = results.Elements.ConvertAll(owner => _propertyOwnerMapper.GetPropertyOwnerDto(owner))
         });
     }
+
+    public async Task<IActionResult> UpdatePassword(string vat, PropertyOwnerPasswordChangeRequestDto passwordChangeRequestDto)
+    {
+        PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
+
+        if (propertyOwner == null)
+        {
+            return new NotFoundObjectResult($"There is no property owner with {vat}.");
+        }
+
+        propertyOwner.Password = BCrypt.Net.BCrypt.HashPassword(passwordChangeRequestDto.Password);
+
+        await _propertyOwnerRepository.Update(vat, propertyOwner);
+
+        return new NoContentResult();
+    }
 }
