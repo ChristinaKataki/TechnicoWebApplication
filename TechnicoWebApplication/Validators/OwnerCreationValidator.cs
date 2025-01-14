@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 using TechnicoWebApplication.Dtos;
 
 namespace TechnicoWebApplication.Validators;
-public class OwnerValidator : AbstractValidator<PropertyOwnerRequestDto>
+public class OwnerCreationValidator : AbstractValidator<PropertyOwnerCreationRequestDto>
 {
-    public OwnerValidator()
+    public OwnerCreationValidator()
     {
-        RuleFor(o => o.Email).EmailAddress();
+        Include(new OwnerUpdateValidator());
         RuleFor(o => o.Password)
             .NotEmpty().WithMessage("Password is required.")
             .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")

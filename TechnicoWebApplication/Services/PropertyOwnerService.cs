@@ -27,7 +27,7 @@ public class PropertyOwnerService
         _propertyOwnerMapper = new PropertyOwnerMapper();
     }
 
-    public async Task<ActionResult<PropertyOwnerResponseDto>> Create(PropertyOwnerRequestDto propertyOwnerRequestDto)
+    public async Task<ActionResult<PropertyOwnerResponseDto>> Create(PropertyOwnerCreationRequestDto propertyOwnerRequestDto)
     {
         PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
 
@@ -73,21 +73,22 @@ public class PropertyOwnerService
         return new OkObjectResult(propertyOwnerLoginResponseDto);
     }
 
-    public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
+    public async Task<ActionResult<PropertyOwnerResponseDto>> Update(string vat, PropertyOwnerUpdateRequestDto propertyOwnerRequestDto)
     {
-        PropertyOwner propertyOwner = _propertyOwnerMapper.GetPropertyOwnerModel(propertyOwnerRequestDto);
+        PropertyOwner? propertyOwner = await _propertyOwnerRepository.Read(vat);
 
-        if (vat != propertyOwner.Vat)
-        {
-            return new BadRequestObjectResult($"Vat specified in path ({vat}) is different from vat in request body ({propertyOwner.Vat}).");
-        }
-
-        PropertyOwner? updatedOwner = await _propertyOwnerRepository.Update(vat, propertyOwner);
-
-        if (updatedOwner == null)
+        if (propertyOwner == null)
         {
             return new NotFoundObjectResult($"There is no property owner with {vat}.");
         }
+
+        propertyOwner.Name = propertyOwnerRequestDto.Name;
+        propertyOwner.Surname = propertyOwnerRequestDto.Surname;
+        propertyOwner.PhoneNumber = propertyOwnerRequestDto.PhoneNumber;
+        propertyOwner.Address = propertyOwnerRequestDto.Address;
+        propertyOwner.Email = propertyOwnerRequestDto.Email;
+
+        PropertyOwner? updatedOwner = await _propertyOwnerRepository.Update(vat, propertyOwner);
 
         PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(updatedOwner);
 

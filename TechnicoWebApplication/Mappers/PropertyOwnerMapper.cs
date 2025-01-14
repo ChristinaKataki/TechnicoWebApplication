@@ -11,7 +11,7 @@ using TechnicoWebApplication.Models;
 namespace TechnicoWebApplication.Mappers;
 public class PropertyOwnerMapper
 {
-    public PropertyOwner GetPropertyOwnerModel(PropertyOwnerRequestDto propertyOwnerRequestDto)
+    public PropertyOwner GetPropertyOwnerModel(PropertyOwnerCreationRequestDto propertyOwnerRequestDto)
     {
         return new PropertyOwner
         {

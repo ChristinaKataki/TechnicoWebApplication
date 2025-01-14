@@ -52,18 +52,11 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
 
     public async Task<PropertyOwner?> Update(string id, PropertyOwner propertyOwner)
     {
-        var existingOwner = await _dbContext.PropertyOwners.FindAsync(id);
-
-        if (existingOwner == null)
-        {
-            return null;
-        }
-
-        _dbContext.Entry(existingOwner).CurrentValues.SetValues(propertyOwner);
+        _dbContext.Entry(propertyOwner).CurrentValues.SetValues(propertyOwner);
 
         await _dbContext.SaveChangesAsync();
 
-        return existingOwner;
+        return propertyOwner;
     }
 
     public async Task<PropertyOwner?> ReadByEmail(string email)

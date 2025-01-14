@@ -38,7 +38,7 @@ namespace TechnicoWebApplication.Controllers
 
         // CREATE
         [HttpPost]
-        public async Task<ActionResult<PropertyOwnerResponseDto>> PostPropertyOwner(PropertyOwnerRequestDto propertyOwnerRequestDto)
+        public async Task<ActionResult<PropertyOwnerResponseDto>> PostPropertyOwner(PropertyOwnerCreationRequestDto propertyOwnerRequestDto)
         {
             var response = await _propertyOwnerService.Create(propertyOwnerRequestDto);
             return response;
@@ -89,14 +89,14 @@ namespace TechnicoWebApplication.Controllers
         // PUT
         [HttpPut("{vat}")]
         [Authorize]
-        public async Task<ActionResult<PropertyOwnerResponseDto>> PutPropertyOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat, PropertyOwnerRequestDto propertyOwnerRequestDto)
+        public async Task<ActionResult<PropertyOwnerResponseDto>> PutPropertyOwner([RegularExpression(@"^\d{9}$", ErrorMessage = "Vat must contain 9 digits.")] string vat, PropertyOwnerUpdateRequestDto propertyOwnerUpdateRequestDto)
         {
             if (User.FindFirst("vat")?.Value != vat && User.FindFirst("userType")?.Value != UserType.Admin.ToString())
             {
                 return Forbid();
             }
 
-            var response = await _propertyOwnerService.Update(vat, propertyOwnerRequestDto);
+            var response = await _propertyOwnerService.Update(vat, propertyOwnerUpdateRequestDto);
             return response;
         }
 
