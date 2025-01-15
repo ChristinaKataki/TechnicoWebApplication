@@ -41,6 +41,12 @@ public class PropertyOwnerService
             return new ConflictObjectResult($"Email {propertyOwner.Email} has already been used.");
         }
 
+        PropertyOwner? softDeletedOwner = await _propertyOwnerRepository.ReadSoftDeleted(propertyOwner.Vat);
+        if (softDeletedOwner != null)
+        {
+            return new ConflictObjectResult($"The property owner with VAT {propertyOwner.Vat} has been deactivated.");
+        }
+
         PropertyOwner createdPropertyOwner = await _propertyOwnerRepository.Create(propertyOwner);
         PropertyOwnerResponseDto propertyOwnerResponseDto = _propertyOwnerMapper.GetPropertyOwnerDto(createdPropertyOwner);
         return new OkObjectResult(propertyOwnerResponseDto);

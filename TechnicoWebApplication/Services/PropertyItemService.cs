@@ -41,6 +41,19 @@ public class PropertyItemService
             return new ConflictObjectResult($"Property item with id {propertyItem.Id} already exists.");
         }
 
+        PropertyItem? softDeletedItem = await _propertyItemRepository.ReadSoftDeleted(propertyItem.Id);
+        if (softDeletedItem != null)
+        {
+            if (softDeletedItem.PropertyOwner.Vat != propertyItem.PropertyOwner.Vat)
+            {
+                return new ConflictObjectResult($"Deactivated property item with id {propertyItem.Id} belongs to another owner.");
+            } 
+            else 
+            {
+                return new ConflictObjectResult($"Deactivated property item with id {propertyItem.Id} exists for owner with vat {propertyItem.PropertyOwner.Vat}.");
+            }
+        }
+
         PropertyItem createdPropertyItem = await _propertyItemRepository.Create(propertyItem);
         PropertyItemResponseDto propertyItemResponseDto = _propertyItemMapper.GetPropertyItemDto(createdPropertyItem);
         return new OkObjectResult(propertyItemResponseDto);

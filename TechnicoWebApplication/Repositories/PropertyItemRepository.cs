@@ -37,6 +37,15 @@ public class PropertyItemRepository : IRepository<PropertyItem, string, Property
         return true;
     }
 
+    public async Task<PropertyItem?> ReadSoftDeleted(string id)
+    {
+        return await _dbContext.PropertyItems
+            .IgnoreQueryFilters()
+            .Include(item => item.PropertyOwner)
+            .Include(item => item.Repairs)
+            .FirstOrDefaultAsync(item => item.Id == id);
+    }
+
     public async Task<PropertyItem?> Read(string id)
     {
         return await _dbContext.PropertyItems

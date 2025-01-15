@@ -42,6 +42,15 @@ public class PropertyOwnerRepository : IRepository<PropertyOwner, string, Proper
         return true;
     }
 
+    public async Task<PropertyOwner?> ReadSoftDeleted(string id)
+    {
+        return await _dbContext.PropertyOwners
+            .IgnoreQueryFilters()
+            .Include(owner => owner.PropertyItems)
+            .ThenInclude(item => item.Repairs)
+            .FirstOrDefaultAsync(owner => owner.Vat == id);
+    }
+
     public async Task<PropertyOwner?> Read(string id)
     {
         return await _dbContext.PropertyOwners
