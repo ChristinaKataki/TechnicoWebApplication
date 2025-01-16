@@ -78,6 +78,11 @@ public class RepairRepository : IRepository<Repair, long, RepairFilters>
             query = query.Where(repair => repair.PropertyItem.PropertyOwner.Vat == filters.Vat);
         }
 
+        if (filters.Status != null)
+        {
+            query = query.Where(repair => repair.Status == filters.Status);
+        }
+
         if (filters.MinDate != null)
         {
             query = query.Where(repair => repair.RepairDate >= filters.MinDate);
