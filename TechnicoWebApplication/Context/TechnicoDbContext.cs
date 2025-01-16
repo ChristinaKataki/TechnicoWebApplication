@@ -59,6 +59,18 @@ public class TechnicoDbContext : DbContext
             .HasMany(item => item.Repairs)
             .WithOne(repair => repair.PropertyItem)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Repair>()
+        .HasIndex(repair => repair.Status)
+        .HasDatabaseName("IX_Repair_Status");
+
+        modelBuilder.Entity<Repair>()
+            .HasIndex(repair => repair.RepairDate)
+            .HasDatabaseName("IX_Repair_Date");
+
+        modelBuilder.Entity<PropertyOwner>()
+            .HasIndex(owner => owner.Email)
+            .HasDatabaseName("IX_PropertyOwner_Email");
     }
 }
 

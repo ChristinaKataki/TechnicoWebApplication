@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechnicoWebApplication.Context;
 
@@ -11,9 +12,11 @@ using TechnicoWebApplication.Context;
 namespace TechnicoWebApplication.Migrations
 {
     [DbContext(typeof(TechnicoDbContext))]
-    partial class TechnicoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250116211137_M6")]
+    partial class M6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
